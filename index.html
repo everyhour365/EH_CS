@@ -18,37 +18,40 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .header-left p{font-size:11px;opacity:.6;margin-top:2px}
 .refresh-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer}
 
-.search-wrap{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99}
+.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99}
 .search-box{display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:0 14px;gap:8px;transition:border-color .15s}
 .search-box:focus-within{border-color:var(--brand)}
 .search-box input{flex:1;border:none;background:transparent;padding:11px 0;font-size:15px;color:var(--text);outline:none}
 .search-box input::placeholder{color:var(--hint)}
 .clear-btn{background:none;border:none;color:var(--hint);font-size:17px;cursor:pointer;padding:2px;display:none}
 
-.tabs-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:113px;z-index:98}
-.tabs-wrap::-webkit-scrollbar{display:none}
-.tabs{display:flex;padding:0 12px;min-width:max-content}
-.tab{padding:10px 13px;font-size:13px;font-weight:500;color:var(--sub);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s}
-.tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:700}
-.tab-cnt{font-size:10px;background:var(--bg);border-radius:8px;padding:1px 5px;margin-left:3px;color:var(--hint)}
-.tab.active .tab-cnt{background:var(--brand-light);color:var(--brand-mid)}
+/* 카테고리 필터 박스 */
+.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:113px;z-index:98}
+.cat-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.cat-pills::-webkit-scrollbar{display:none}
+.cat-pill{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--sub);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+.cat-pill.active{border-color:var(--cs);background:var(--cb);color:var(--ct)}
+.cat-pill .pill-cnt{font-size:10px;opacity:.7;margin-left:1px}
 
-.result-info{padding:8px 16px 4px;font-size:12px;color:var(--hint)}
+/* 탭 (카테고리 이름 상단 탭 — 제거하고 필터박스로 대체) */
+.tabs-wrap{display:none}
+
+.result-info{padding:6px 16px 2px;font-size:12px;color:var(--hint)}
 
 .list{padding:4px 16px 20px;display:flex;flex-direction:column;gap:8px}
 
-.card{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .15s}
-.card.open{border-color:var(--brand)}
+/* 카드 */
+.card{background:var(--surface);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .15s}
 .card:active{opacity:.92}
-.card-head{padding:14px 16px;display:flex;align-items:flex-start;gap:10px}
-.cat-badge{font-size:10px;background:var(--brand-light);color:var(--brand);border-radius:6px;padding:3px 8px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.card-head{padding:13px 14px;display:flex;align-items:flex-start;gap:8px}
+.cat-badge{font-size:10px;border-radius:6px;padding:3px 8px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:2px;background:var(--cb);color:var(--ct);border:1px solid transparent}
 .card-title{font-size:14px;font-weight:600;color:var(--text);flex:1;line-height:1.4}
 .chevron{font-size:11px;color:var(--hint);flex-shrink:0;margin-top:3px;transition:transform .2s}
 .card.open .chevron{transform:rotate(180deg)}
-.preview{padding:0 16px 13px;font-size:12px;color:var(--hint);line-height:1.5}
+.preview{padding:0 14px 12px;font-size:12px;color:var(--hint);line-height:1.5}
 
-.card-body{padding:0 16px 16px;border-top:1px solid var(--border)}
-.answer-box{margin-top:12px;background:var(--bg);border-radius:10px;padding:13px 14px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;user-select:text}
+.card-body{padding:0 14px 14px;border-top:1px solid var(--border)}
+.answer-box{margin-top:11px;background:var(--bg);border-radius:10px;padding:12px 13px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;user-select:text}
 
 .img-section{margin-top:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .img-label{font-size:11px;font-weight:600;color:var(--sub);padding:7px 12px;background:var(--bg);border-bottom:1px solid var(--border)}
@@ -56,19 +59,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .img-open{width:100%;padding:9px;background:none;border:none;border-top:1px solid var(--border);font-size:12px;font-weight:600;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
 
 .btn-row{margin-top:10px}
-.copy-btn{width:100%;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
-.copy-btn.done{background:var(--brand-mid)}
+.copy-btn{width:100%;padding:13px;background:var(--cs,var(--brand));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.copy-btn.done{opacity:.75}
 .copy-btn:active{opacity:.85}
 
 .loading{text-align:center;padding:60px 20px;color:var(--hint)}
 .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .error-box{margin:20px 0;background:#fff5f5;border:1px solid #fcc;border-radius:12px;padding:16px;font-size:13px;color:#c0392b;line-height:1.7}
-
 .empty{text-align:center;padding:60px 20px;color:var(--hint)}
 .empty-icon{font-size:40px;margin-bottom:12px}
-
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:#1c1c1a;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -91,30 +91,65 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   </div>
 </div>
 
-<div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
+<div class="cat-filter-wrap">
+  <div class="cat-pills" id="cat-pills"></div>
+</div>
+
 <div class="result-info" id="result-info"></div>
 <div class="list" id="list">
   <div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 const SHEET_ID = '1RVdbwrSjLRANNatKFoElDJ3FlZFdbxew';
 const GID = '395124987';
 
+// 카테고리 색상 팔레트 (bg, text, stroke)
+const CAT_COLORS = [
+  {cb:'#e8f0e8',ct:'#1a3d1a',cs:'#2d7a2d'},  // 초록
+  {cb:'#e8f0f8',ct:'#0d2d52',cs:'#2060b0'},  // 파랑
+  {cb:'#f0eef8',ct:'#3b2870',cs:'#7060d0'},  // 보라
+  {cb:'#fff3e8',ct:'#6b3800',cs:'#d07000'},  // 주황
+  {cb:'#fff8e0',ct:'#5c4000',cs:'#b08800'},  // 노랑
+  {cb:'#fdeaea',ct:'#6b1a1a',cs:'#c43030'},  // 빨강
+  {cb:'#e8f8ee',ct:'#0d4020',cs:'#208040'},  // 녹색
+  {cb:'#fde8f5',ct:'#5c1040',cs:'#c030a0'},  // 핑크
+  {cb:'#e8f5fe',ct:'#0d3050',cs:'#1080c8'},  // 하늘
+  {cb:'#f5f0ff',ct:'#3d1a6b',cs:'#8040d0'},  // 라벤더
+];
+
 let allData = [];
+let catColorMap = {};
 let activeCat = '전체';
 let query = '';
 let openId = null;
 
+function getCatColor(cat) {
+  return catColorMap[cat] || {cb:'#f0f0f0',ct:'#333',cs:'#999'};
+}
+
+function catStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="background:${c.cb};color:${c.ct};border-color:${c.cs}"`;
+}
+
+function cardStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="border-color:${c.cs}22"`;
+}
+
+function openCardStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="border-color:${c.cs}"`;
+}
+
 async function loadData() {
   document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
   document.getElementById('header-sub').textContent = '불러오는 중...';
-  document.getElementById('tabs').innerHTML = '';
+  document.getElementById('cat-pills').innerHTML = '';
 
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
-
   try {
     const res = await fetch(url);
     const text = await res.text();
@@ -123,18 +158,22 @@ async function loadData() {
     const json = JSON.parse(raw[1]);
     const rows = json.table.rows;
 
-    allData = rows
-      .map((r, i) => ({
-        _id: i,
-        cat:    (r.c[0]?.v ?? '').toString().trim(),
-        title:  (r.c[1]?.v ?? '').toString().trim(),
-        answer: (r.c[2]?.v ?? '').toString().trim(),
-        img:    (r.c[3]?.v ?? '').toString().trim(),
-      }))
-      .filter(d => d.answer);
+    allData = rows.map((r, i) => ({
+      _id: i,
+      cat:    (r.c[0]?.v ?? '').toString().trim(),
+      title:  (r.c[1]?.v ?? '').toString().trim(),
+      answer: (r.c[2]?.v ?? '').toString().trim(),
+      img:    (r.c[3]?.v ?? '').toString().trim(),
+    })).filter(d => d.answer);
+
+    // 카테고리 순서대로 색상 배정
+    const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
+    cats.forEach((c, i) => {
+      catColorMap[c] = CAT_COLORS[i % CAT_COLORS.length];
+    });
 
     document.getElementById('header-sub').textContent = `성수점 · ${allData.length}개 답변`;
-    renderTabs();
+    renderPills();
     renderList();
   } catch(e) {
     document.getElementById('header-sub').textContent = '로드 실패';
@@ -161,14 +200,34 @@ function filtered() {
   });
 }
 
-function renderTabs() {
+function renderPills() {
   const cats = ['전체', ...new Set(allData.map(d => d.cat).filter(Boolean))];
-  document.getElementById('tabs').innerHTML = cats.map(c => {
+  const wrap = document.getElementById('cat-pills');
+  wrap.innerHTML = cats.map(c => {
     const cnt = c === '전체' ? allData.length : allData.filter(d => d.cat === c).length;
-    return `<button class="tab${activeCat === c ? ' active' : ''}" onclick="setTab(${JSON.stringify(c)})">
-      ${c}<span class="tab-cnt">${cnt}</span>
+    const isActive = activeCat === c;
+    let st = '';
+    if (c === '전체') {
+      st = isActive
+        ? `style="background:#1c1c1a;color:#fff;border-color:#1c1c1a"`
+        : `style="background:var(--surface);color:var(--sub);border-color:var(--border)"`;
+    } else {
+      const col = getCatColor(c);
+      st = isActive
+        ? `style="background:${col.cs};color:#fff;border-color:${col.cs}"`
+        : `style="background:${col.cb};color:${col.ct};border-color:${col.cs}55"`;
+    }
+    return `<button class="cat-pill${isActive?' active':''}" ${st} data-cat="${c}">
+      ${c}<span class="pill-cnt">${cnt}</span>
     </button>`;
   }).join('');
+
+  wrap.querySelectorAll('.cat-pill').forEach(btn => {
+    const cat = btn.dataset.cat;
+    const handler = (e) => { e.preventDefault(); setTab(cat); };
+    btn.addEventListener('touchend', handler);
+    btn.addEventListener('click', handler);
+  });
 }
 
 function renderList() {
@@ -186,12 +245,19 @@ function renderList() {
   list.innerHTML = items.map(d => {
     const id = d._id;
     const isOpen = openId === id;
-    const titleText = d.title || d.answer.replace(/\n/g,' ').slice(0, 40) + '…';
-    const preview = d.answer.replace(/\n/g,' ').slice(0, 58) + (d.answer.length > 58 ? '…' : '');
+    const col = getCatColor(d.cat);
+    // 키워드/태그 있으면 우선, 없으면 답변 첫 줄을 제목으로
+    const firstLine = d.answer.split('\n').find(l => l.trim()) || '';
+    const titleText = d.title || firstLine.slice(0, 28) + (firstLine.length > 28 ? '…' : '');
+    const previewSrc = d.title ? d.answer : d.answer.replace(firstLine, '').trim();
+    const preview = (previewSrc || d.answer).replace(/\n/g,' ').slice(0, 55) + '…';
+    const borderSt = isOpen
+      ? `style="border-color:${col.cs}"`
+      : `style="border-color:${col.cs}33"`;
 
-    return `<div class="card${isOpen ? ' open' : ''}" id="card-${id}">
+    return `<div class="card${isOpen?' open':''}" id="card-${id}" ${borderSt}>
       <div class="card-head" onclick="toggle(${id})">
-        <span class="cat-badge">${d.cat || '기타'}</span>
+        <span class="cat-badge" style="background:${col.cb};color:${col.ct}">${esc(d.cat||'기타')}</span>
         <span class="card-title">${esc(titleText)}</span>
         <span class="chevron">▼</span>
       </div>
@@ -201,10 +267,10 @@ function renderList() {
         ${d.img ? `<div class="img-section">
           <div class="img-label">📎 첨부 이미지</div>
           <img class="img-thumb" src="${d.img}" onerror="this.parentElement.style.display='none'" onclick="window.open('${d.img}','_blank')">
-          <button class="img-open" onclick="window.open('${d.img}','_blank')">⬇ 이미지 열기 / 저장</button>
+          <button class="img-open" style="color:${col.cs}" onclick="window.open('${d.img}','_blank')">⬇ 이미지 열기 / 저장</button>
         </div>` : ''}
         <div class="btn-row">
-          <button class="copy-btn" id="btn-${id}" onclick="copyAnswer(${id})">복사하기</button>
+          <button class="copy-btn" id="btn-${id}" style="background:${col.cs}" onclick="copyAnswer(${id})">복사하기</button>
         </div>
       </div>` : ''}
     </div>`;
@@ -229,7 +295,7 @@ function toggle(id) {
 function setTab(c) {
   activeCat = c;
   openId = null;
-  renderTabs();
+  renderPills();
   renderList();
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
