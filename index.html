@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>에브리아워 CS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f4f0;--surface:#fff;--border:#e8e6df;
+  --text:#1c1c1a;--sub:#6b6860;--hint:#b0ada6;
+  --brand:#2d4a2d;--brand-light:#e8f0e8;--brand-mid:#4a7c4a;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;padding-bottom:40px}
+
+.header{background:var(--brand);color:#fff;padding:16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.header-left h1{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.header-left p{font-size:11px;opacity:.6;margin-top:2px}
+.refresh-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer}
+
+.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99}
+.search-box{display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:0 14px;gap:8px;transition:border-color .15s}
+.search-box:focus-within{border-color:var(--brand)}
+.search-box input{flex:1;border:none;background:transparent;padding:11px 0;font-size:15px;color:var(--text);outline:none}
+.search-box input::placeholder{color:var(--hint)}
+.clear-btn{background:none;border:none;color:var(--hint);font-size:17px;cursor:pointer;padding:2px;display:none}
+
+/* 카테고리 필터 박스 */
+.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:113px;z-index:98}
+.cat-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.cat-pills::-webkit-scrollbar{display:none}
+.cat-pill{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--sub);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+.cat-pill.active{border-color:var(--cs);background:var(--cb);color:var(--ct)}
+.cat-pill .pill-cnt{font-size:10px;opacity:.7;margin-left:1px}
+
+/* 탭 (카테고리 이름 상단 탭 — 제거하고 필터박스로 대체) */
+.tabs-wrap{display:none}
+
+.result-info{padding:6px 16px 2px;font-size:12px;color:var(--hint)}
+
+.list{padding:4px 16px 20px;display:flex;flex-direction:column;gap:8px}
+
+/* 카드 */
+.card{background:var(--surface);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.card:active{opacity:.92}
+.card-head{padding:13px 14px;display:flex;align-items:flex-start;gap:8px}
+.cat-badge{font-size:10px;border-radius:6px;padding:3px 8px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:2px;background:var(--cb);color:var(--ct);border:1px solid transparent}
+.card-title{font-size:14px;font-weight:600;color:var(--text);flex:1;line-height:1.4}
+.chevron{font-size:11px;color:var(--hint);flex-shrink:0;margin-top:3px;transition:transform .2s}
+.card.open .chevron{transform:rotate(180deg)}
+.preview{padding:0 14px 12px;font-size:12px;color:var(--hint);line-height:1.5}
+
+.card-body{padding:0 14px 14px;border-top:1px solid var(--border)}
+.answer-box{margin-top:11px;background:var(--bg);border-radius:10px;padding:12px 13px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;user-select:text}
+
+.img-section{margin-top:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.img-label{font-size:11px;font-weight:600;color:var(--sub);padding:7px 12px;background:var(--bg);border-bottom:1px solid var(--border)}
+.img-thumb{width:100%;max-height:220px;object-fit:contain;display:block;background:#f0f0ec;cursor:pointer}
+.img-open{width:100%;padding:9px;background:none;border:none;border-top:1px solid var(--border);font-size:12px;font-weight:600;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+
+.btn-row{margin-top:10px}
+.copy-btn{width:100%;padding:13px;background:var(--cs,var(--brand));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.copy-btn.done{opacity:.75}
+.copy-btn:active{opacity:.85}
+
+.loading{text-align:center;padding:60px 20px;color:var(--hint)}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{margin:20px 0;background:#fff5f5;border:1px solid #fcc;border-radius:12px;padding:16px;font-size:13px;color:#c0392b;line-height:1.7}
+.empty{text-align:center;padding:60px 20px;color:var(--hint)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:#1c1c1a;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>에브리아워 CS</h1>
+    <p id="header-sub">불러오는 중...</p>
+  </div>
+  <button class="refresh-btn" onclick="loadData()">↺ 새로고침</button>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span style="color:var(--hint);font-size:15px">🔍</span>
+    <input type="search" id="search-input" placeholder="키워드 검색..." oninput="onSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+
+<div class="cat-filter-wrap">
+  <div class="cat-pills" id="cat-pills"></div>
+</div>
+
+<div class="result-info" id="result-info"></div>
+<div class="list" id="list">
+  <div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_ID = '1RVdbwrSjLRANNatKFoElDJ3FlZFdbxew';
+const GID = '395124987';
+
+// 카테고리 색상 팔레트 (bg, text, stroke)
+const CAT_COLORS = [
+  {cb:'#e8f0e8',ct:'#1a3d1a',cs:'#2d7a2d'},  // 초록
+  {cb:'#e8f0f8',ct:'#0d2d52',cs:'#2060b0'},  // 파랑
+  {cb:'#f0eef8',ct:'#3b2870',cs:'#7060d0'},  // 보라
+  {cb:'#fff3e8',ct:'#6b3800',cs:'#d07000'},  // 주황
+  {cb:'#fff8e0',ct:'#5c4000',cs:'#b08800'},  // 노랑
+  {cb:'#fdeaea',ct:'#6b1a1a',cs:'#c43030'},  // 빨강
+  {cb:'#e8f8ee',ct:'#0d4020',cs:'#208040'},  // 녹색
+  {cb:'#fde8f5',ct:'#5c1040',cs:'#c030a0'},  // 핑크
+  {cb:'#e8f5fe',ct:'#0d3050',cs:'#1080c8'},  // 하늘
+  {cb:'#f5f0ff',ct:'#3d1a6b',cs:'#8040d0'},  // 라벤더
+];
+
+let allData = [];
+let catColorMap = {};
+let activeCat = '전체';
+let query = '';
+let openId = null;
+
+function getCatColor(cat) {
+  return catColorMap[cat] || {cb:'#f0f0f0',ct:'#333',cs:'#999'};
+}
+
+function catStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="background:${c.cb};color:${c.ct};border-color:${c.cs}"`;
+}
+
+function cardStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="border-color:${c.cs}22"`;
+}
+
+function openCardStyle(cat) {
+  const c = getCatColor(cat);
+  return `style="border-color:${c.cs}"`;
+}
+
+async function loadData() {
+  document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
+  document.getElementById('header-sub').textContent = '불러오는 중...';
+  document.getElementById('cat-pills').innerHTML = '';
+
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const raw = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?\s*$/);
+    if (!raw) throw new Error('파싱 실패');
+    const json = JSON.parse(raw[1]);
+    const rows = json.table.rows;
+
+    allData = rows.map((r, i) => ({
+      _id: i,
+      cat:    (r.c[0]?.v ?? '').toString().trim(),
+      title:  (r.c[1]?.v ?? '').toString().trim(),
+      answer: (r.c[2]?.v ?? '').toString().trim(),
+      img:    (r.c[3]?.v ?? '').toString().trim(),
+    })).filter(d => d.answer);
+
+    // 카테고리 순서대로 색상 배정
+    const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
+    cats.forEach((c, i) => {
+      catColorMap[c] = CAT_COLORS[i % CAT_COLORS.length];
+    });
+
+    document.getElementById('header-sub').textContent = `성수점 · ${allData.length}개 답변`;
+    renderPills();
+    renderList();
+  } catch(e) {
+    document.getElementById('header-sub').textContent = '로드 실패';
+    document.getElementById('list').innerHTML = `
+      <div class="error-box">
+        ⚠️ 데이터를 불러오지 못했어요.<br><br>
+        구글 시트 공유 설정을 확인해주세요.<br>
+        <strong>일반 액세스 → 링크가 있는 모든 사용자 → 뷰어</strong><br><br>
+        설정 후 <strong>새로고침</strong> 버튼을 눌러주세요.
+      </div>`;
+  }
+}
+
+function filtered() {
+  return allData.filter(d => {
+    const catOk = activeCat === '전체' || d.cat === activeCat;
+    if (!query) return catOk;
+    const q = query.toLowerCase();
+    return catOk && (
+      d.title.toLowerCase().includes(q) ||
+      d.answer.toLowerCase().includes(q) ||
+      d.cat.toLowerCase().includes(q)
+    );
+  });
+}
+
+function renderPills() {
+  const cats = ['전체', ...new Set(allData.map(d => d.cat).filter(Boolean))];
+  const wrap = document.getElementById('cat-pills');
+  wrap.innerHTML = cats.map(c => {
+    const cnt = c === '전체' ? allData.length : allData.filter(d => d.cat === c).length;
+    const isActive = activeCat === c;
+    let st = '';
+    if (c === '전체') {
+      st = isActive
+        ? `style="background:#1c1c1a;color:#fff;border-color:#1c1c1a"`
+        : `style="background:var(--surface);color:var(--sub);border-color:var(--border)"`;
+    } else {
+      const col = getCatColor(c);
+      st = isActive
+        ? `style="background:${col.cs};color:#fff;border-color:${col.cs}"`
+        : `style="background:${col.cb};color:${col.ct};border-color:${col.cs}55"`;
+    }
+    return `<button class="cat-pill${isActive?' active':''}" ${st} data-cat="${c}">
+      ${c}<span class="pill-cnt">${cnt}</span>
+    </button>`;
+  }).join('');
+
+  wrap.querySelectorAll('.cat-pill').forEach(btn => {
+    const cat = btn.dataset.cat;
+    const handler = (e) => { e.preventDefault(); setTab(cat); };
+    btn.addEventListener('touchend', handler);
+    btn.addEventListener('click', handler);
+  });
+}
+
+function renderList() {
+  const items = filtered();
+  const info = document.getElementById('result-info');
+  const list = document.getElementById('list');
+
+  info.textContent = query ? `"${query}" 검색결과 ${items.length}개` : `총 ${items.length}개`;
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><p style="font-size:14px;margin-top:4px">검색 결과가 없어요</p></div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(d => {
+    const id = d._id;
+    const isOpen = openId === id;
+    const col = getCatColor(d.cat);
+    // 키워드/태그 있으면 우선, 없으면 답변 첫 줄을 제목으로
+    const firstLine = d.answer.split('\n').find(l => l.trim()) || '';
+    const titleText = d.title || firstLine.slice(0, 28) + (firstLine.length > 28 ? '…' : '');
+    const previewSrc = d.title ? d.answer : d.answer.replace(firstLine, '').trim();
+    const preview = (previewSrc || d.answer).replace(/\n/g,' ').slice(0, 55) + '…';
+    const borderSt = isOpen
+      ? `style="border-color:${col.cs}"`
+      : `style="border-color:${col.cs}33"`;
+
+    return `<div class="card${isOpen?' open':''}" id="card-${id}" ${borderSt}>
+      <div class="card-head" onclick="toggle(${id})">
+        <span class="cat-badge" style="background:${col.cb};color:${col.ct}">${esc(d.cat||'기타')}</span>
+        <span class="card-title">${esc(titleText)}</span>
+        <span class="chevron">▼</span>
+      </div>
+      ${!isOpen ? `<div class="preview">${esc(preview)}</div>` : ''}
+      ${isOpen ? `<div class="card-body">
+        <div class="answer-box">${esc(d.answer)}</div>
+        ${d.img ? `<div class="img-section">
+          <div class="img-label">📎 첨부 이미지</div>
+          <img class="img-thumb" src="${d.img}" onerror="this.parentElement.style.display='none'" onclick="window.open('${d.img}','_blank')">
+          <button class="img-open" style="color:${col.cs}" onclick="window.open('${d.img}','_blank')">⬇ 이미지 열기 / 저장</button>
+        </div>` : ''}
+        <div class="btn-row">
+          <button class="copy-btn" id="btn-${id}" style="background:${col.cs}" onclick="copyAnswer(${id})">복사하기</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function esc(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggle(id) {
+  openId = openId === id ? null : id;
+  renderList();
+  if (openId !== null) {
+    setTimeout(() => {
+      const el = document.getElementById('card-' + id);
+      if (el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 60);
+  }
+}
+
+function setTab(c) {
+  activeCat = c;
+  openId = null;
+  renderPills();
+  renderList();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function onSearch(v) {
+  query = v.trim();
+  openId = null;
+  document.getElementById('clear-btn').style.display = v ? 'block' : 'none';
+  renderList();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  onSearch('');
+  document.getElementById('search-input').focus();
+}
+
+function copyAnswer(id) {
+  const d = allData.find(x => x._id === id);
+  if (!d) return;
+  const copy = () => {
+    const btn = document.getElementById('btn-' + id);
+    if (btn) { btn.textContent = '복사됐어요 ✓'; btn.classList.add('done'); }
+    showToast('클립보드에 복사됐어요 ✓');
+    setTimeout(() => {
+      if (btn) { btn.textContent = '복사하기'; btn.classList.remove('done'); }
+    }, 2000);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(d.answer).then(copy).catch(() => fallbackCopy(d.answer, copy));
+  } else {
+    fallbackCopy(d.answer, copy);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+loadData();
+</script>
+</body>
+</html>
