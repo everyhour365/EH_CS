@@ -18,20 +18,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .refresh-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
 
 /* 탭바 */
-.tabbar{display:flex;background:var(--brand);padding:0 16px;position:sticky;top:57px;z-index:97;gap:4px;border-top:1px solid rgba(255,255,255,.1)}
+.tabbar{display:flex;background:var(--brand);padding:0 16px;position:sticky;top:57px;z-index:99;gap:4px;border-top:1px solid rgba(255,255,255,.1)}
 .tab-btn{flex:1;background:none;border:none;color:rgba(255,255,255,.6);padding:12px 0;font-size:14px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
 .tab-btn.active{color:#fff;border-bottom-color:#fff}
 .tab-content{display:none}
 .tab-content.active{display:block}
 
-.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:103px;z-index:99}
+.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:103px;z-index:98}
 .search-box{display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:0 14px;gap:8px;transition:border-color .15s}
 .search-box:focus-within{border-color:var(--brand)}
 .search-box input{flex:1;border:none;background:transparent;padding:11px 0;font-size:16px;color:var(--text);outline:none}
 .search-box input::placeholder{color:var(--hint)}
 .clear-btn{background:none;border:none;color:var(--hint);font-size:18px;cursor:pointer;padding:2px;display:none}
 
-.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:157px;z-index:98}
+.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:157px;z-index:97}
 .cat-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .cat-pills::-webkit-scrollbar{display:none}
 .cat-pill{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--sub);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
@@ -252,6 +252,7 @@ async function loadData() {
     renderPills();
     renderList();
     populateCategoryDropdown();
+    adjustStickyOffsets();
   } catch(e) {
     document.getElementById('header-sub').textContent = '로드 실패';
     document.getElementById('list').innerHTML = `
@@ -601,6 +602,25 @@ async function saveToSheet() {
 function showAiToast(msg) {
   showToast(msg);
 }
+
+function adjustStickyOffsets() {
+  const header = document.querySelector('.header');
+  const tabbar = document.querySelector('.tabbar');
+  const searchWrap = document.querySelector('.search-wrap');
+  const catFilterWrap = document.querySelector('.cat-filter-wrap');
+  if (!header || !tabbar || !searchWrap || !catFilterWrap) return;
+
+  const headerH = header.offsetHeight;
+  const tabbarH = tabbar.offsetHeight;
+  const searchH = searchWrap.offsetHeight;
+
+  tabbar.style.top = headerH + 'px';
+  searchWrap.style.top = (headerH + tabbarH) + 'px';
+  catFilterWrap.style.top = (headerH + tabbarH + searchH) + 'px';
+}
+
+window.addEventListener('load', adjustStickyOffsets);
+window.addEventListener('resize', adjustStickyOffsets);
 
 loadData();
 </script>
