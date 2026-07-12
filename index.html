@@ -196,8 +196,8 @@ const GID = '395124987';
 const RENDER_API_URL = 'https://YOUR-RENDER-APP.onrender.com/api/refine';
 const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyunGFVicRGQEEvagYuuLT6r_nSmSbdZIyEbwMTG1ab1uq0ItyC1huz8Q5FJuKNpu3C/exec';
 
-// 요금표 탭 (GID 대신 이름으로 조회 — 실제 탭 이름과 정확히 일치해야 함)
-const PRICING_SHEET_NAME = '요금표(성수,구의)';
+// 요금표 탭의 GID
+const PRICING_GID = '647769517';
 
 // 카테고리 색상 팔레트 (bg, text, stroke)
 const CAT_COLORS = [
@@ -460,9 +460,9 @@ async function loadPricing() {
   const list = document.getElementById('pricing-list');
   list.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
 
-  // GID+range 조합은 구글 gviz API에서 가끔 다른 탭 데이터를 반환하는
-  // 버그가 있어 시트 "이름"으로 직접 조회 (더 안정적)
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(PRICING_SHEET_NAME)}&range=A4:G100`;
+  // headers=0으로 명시해서 구글이 헤더 행을 임의로 추측/스킵하지 않게 하고,
+  // 실제 필터링은 아래 JS에서 직접 처리 (숫자 타입 체크로 헤더/빈행 안전하게 무시)
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRICING_GID}&headers=0`;
 
   try {
     const res = await fetch(url);
@@ -515,8 +515,7 @@ async function loadPricing() {
     console.error(e);
     list.innerHTML = `<div class="error-box">
       ⚠️ 요금표를 불러오지 못했어요.<br><br>
-      "${PRICING_SHEET_NAME}" 탭의 이름과 공유 설정을 확인해주세요.<br>
-      (탭 이름이 정확히 일치해야 하고)<br>
+      "${PRICING_GID}" GID의 시트 공유 설정을 확인해주세요.<br>
       <strong>일반 액세스 → 링크가 있는 모든 사용자 → 뷰어</strong>
     </div>`;
   }
