@@ -124,9 +124,7 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
 
 <div class="tabbar">
   <button class="tab-btn active" data-tab="search" onclick="switchTab('search')">답변검색</button>
-  <!-- Claude API 결제 완료 후 아래 주석 해제하면 AI 탭 다시 노출됨
-  <button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">AI 수정·추가</button>
-  -->
+  <button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">답변 추가</button>
   <button class="tab-btn" data-tab="pricing" onclick="switchTab('pricing')">요금표</button>
 </div>
 
@@ -151,50 +149,26 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
   </div>
 </div>
 
-<!-- 탭 2: AI 수정·추가 -->
+<!-- 탭 2: 답변 추가 (Claude API 결제 전까지는 AI 다듬기 없이 바로 저장하는 간이 버전) -->
 <div id="tab-ai" class="tab-content">
   <div class="ai-wrap">
 
-    <div class="step-indicator" id="step-indicator">
-      <div class="step active" data-step="1"><span class="step-num">①</span><span>내용 입력</span></div>
-      <div class="step" data-step="2"><span class="step-num">②</span><span>AI 다듬기</span></div>
-      <div class="step" data-step="3"><span class="step-num">③</span><span>시트 추가</span></div>
+    <div class="ai-section">
+      <label class="ai-label">답변 내용</label>
+      <textarea id="ai-input" class="ai-textarea" placeholder="추가할 답변 내용을 입력하세요"></textarea>
+      <p class="ai-hint">※ AI 다듬기 기능은 Claude API 결제 완료 후 이 자리에 추가될 예정이에요. 지금은 입력한 내용 그대로 저장돼요.</p>
     </div>
 
     <div class="ai-section">
-      <label class="ai-label">원본 내용 입력</label>
-      <textarea id="ai-input" class="ai-textarea" placeholder="대충 써도 돼요. AI가 에브리아워 톤으로 다듬어드릴게요 :)"></textarea>
-      <div class="ai-btn-row">
-        <button class="ai-btn" id="ai-refine-btn" onclick="refineAnswer()">✨ AI로 다듬기</button>
-        <button class="ai-btn outline" onclick="resetAi()">↺ 초기화</button>
-      </div>
-    </div>
-
-    <div class="ai-divider-wrap" id="ai-divider-wrap" style="display:none">
-      <div class="ai-divider-line"></div>
-      <span>AI 수정 결과</span>
-      <div class="ai-divider-line"></div>
-    </div>
-
-    <div class="ai-section" id="ai-result-section" style="display:none">
-      <div class="result-label-row">
-        <label class="ai-label" style="margin-bottom:0">다듬어진 답변</label>
-        <span class="ai-badge">AI 수정 완료</span>
-      </div>
-      <textarea id="ai-output" class="ai-textarea" readonly></textarea>
-      <div class="ai-btn-row">
-        <button class="ai-btn outline" onclick="copyAiResult()">📋 복사</button>
-        <button class="ai-btn outline" id="ai-edit-btn" onclick="toggleEditResult()">✏️ 직접 수정</button>
-      </div>
-
-      <div class="ai-divider"></div>
-
-      <label class="ai-label">시트에 저장할 경우 아래 입력</label>
+      <label class="ai-label">시트에 저장</label>
       <label class="ai-sublabel">카테고리</label>
       <select id="ai-cat" class="ai-input-field"></select>
       <label class="ai-sublabel">키워드/태그</label>
       <input type="text" id="ai-title" class="ai-input-field" placeholder="예: 환불규정, 장기등록할인">
-      <button class="ai-btn" onclick="saveToSheet()">＋ 구글 시트에 추가</button>
+      <div class="ai-btn-row">
+        <button class="ai-btn" onclick="saveToSheet()">＋ 구글 시트에 추가</button>
+        <button class="ai-btn outline" onclick="resetAi()">↺ 초기화</button>
+      </div>
     </div>
   </div>
 </div>
@@ -220,7 +194,7 @@ const GID = '395124987';
 
 // ⚠️ 배포 후 아래 두 값을 실제 URL로 교체하세요
 const RENDER_API_URL = 'https://YOUR-RENDER-APP.onrender.com/api/refine';
-const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyunGFVicRGQEEvagYuuLT6r_nSmSbdZIyEbwMTG1ab1uq0ItyC1huz8Q5FJuKNpu3C/exec';
 
 // 요금표 탭 ("요금표(성수,구의)" 탭의 GID)
 const PRICING_GID = '1733758050';
@@ -586,15 +560,7 @@ function formatWon(amt) {
   return num.toLocaleString('ko-KR') + '원';
 }
 
-/* ===== AI 수정·추가 ===== */
-function setStep(n) {
-  document.querySelectorAll('.step').forEach(el => {
-    const s = Number(el.dataset.step);
-    el.classList.toggle('active', s === n);
-    el.classList.toggle('done', s < n);
-  });
-}
-
+/* ===== 답변 추가 (간이 버전: Claude API 결제 전) ===== */
 function populateCategoryDropdown() {
   const sel = document.getElementById('ai-cat');
   if (!sel) return;
@@ -602,80 +568,15 @@ function populateCategoryDropdown() {
   sel.innerHTML = cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
 }
 
-async function refineAnswer() {
-  const input = document.getElementById('ai-input').value.trim();
-  if (!input) { showAiToast('원본 내용을 입력해주세요'); return; }
-
-  const btn = document.getElementById('ai-refine-btn');
-  btn.disabled = true;
-  btn.textContent = '다듬는 중...';
-  setStep(2);
-
-  try {
-    const res = await fetch(RENDER_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: input })
-    });
-    if (!res.ok) throw new Error('서버 오류: ' + res.status);
-    const data = await res.json();
-    if (!data.refined) throw new Error('응답 없음');
-
-    document.getElementById('ai-output').value = data.refined;
-    document.getElementById('ai-output').readOnly = true;
-    document.getElementById('ai-edit-btn').classList.remove('active');
-    document.getElementById('ai-edit-btn').textContent = '✏️ 직접 수정';
-    document.getElementById('ai-divider-wrap').style.display = 'flex';
-    document.getElementById('ai-result-section').style.display = 'block';
-    document.getElementById('ai-result-section').scrollIntoView({behavior:'smooth', block:'nearest'});
-    setStep(3);
-  } catch (e) {
-    showAiToast('다듬기 실패: 서버 연결을 확인해주세요');
-    console.error(e);
-    setStep(1);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '✨ AI로 다듬기';
-  }
-}
-
-function toggleEditResult() {
-  const box = document.getElementById('ai-output');
-  const btn = document.getElementById('ai-edit-btn');
-  const willEdit = box.readOnly;
-  box.readOnly = !willEdit;
-  btn.classList.toggle('active', willEdit);
-  btn.textContent = willEdit ? '✓ 수정 완료' : '✏️ 직접 수정';
-  if (willEdit) box.focus();
-}
-
-function copyAiResult() {
-  const text = document.getElementById('ai-output').value;
-  if (!text) return;
-  const copy = () => showAiToast('클립보드에 복사됐어요 ✓');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(copy).catch(() => fallbackCopy(text, copy));
-  } else {
-    fallbackCopy(text, copy);
-  }
-}
-
 function resetAi() {
   document.getElementById('ai-input').value = '';
-  document.getElementById('ai-output').value = '';
-  document.getElementById('ai-output').readOnly = true;
-  document.getElementById('ai-edit-btn').classList.remove('active');
-  document.getElementById('ai-edit-btn').textContent = '✏️ 직접 수정';
   document.getElementById('ai-title').value = '';
-  document.getElementById('ai-result-section').style.display = 'none';
-  document.getElementById('ai-divider-wrap').style.display = 'none';
-  setStep(1);
 }
 
 async function saveToSheet() {
   const cat = document.getElementById('ai-cat').value.trim();
   const title = document.getElementById('ai-title').value.trim();
-  const answer = document.getElementById('ai-output').value.trim();
+  const answer = document.getElementById('ai-input').value.trim();
 
   if (!cat || !answer) { showAiToast('카테고리와 답변 내용을 확인해주세요'); return; }
 
