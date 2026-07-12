@@ -488,9 +488,11 @@ async function loadPricing() {
       };
 
       const cat = val(0);      // A: 요금제(카테고리)
-      const detail = val(1);   // B: 상세
-      if (!detail) return;     // 빈 행(구분선) 스킵
+      const detailMain = val(1); // B: 상세
+      const detailSub = val(2);  // C: 상세(일수 등 부가 정보)
+      if (!detailMain) return;   // 빈 행(구분선) 스킵
       if (cat) lastCat = cat;
+      const detail = detailSub ? `${detailMain} (${detailSub})` : detailMain;
 
       // 성수점: E 유효기간, F 금액, G 기준, H 비고
       const sValid = val(4), sAmt = num(5), sCriteria = val(6), sNote = val(7);
