@@ -7,40 +7,40 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#f5f4f0;--surface:#fff;--border:#e8e6df;
-  --text:#1c1c1a;--sub:#6b6860;--hint:#b0ada6;
-  --brand:#2d4a2d;--brand-light:#e8f0e8;--brand-mid:#4a7c4a;
+--bg:#f5f4f0;--surface:#fff;--border:#e8e6df;
+--text:#1c1c1a;--sub:#6b6860;--hint:#b0ada6;
+--brand:#2d4a2d;--brand-light:#e8f0e8;--brand-mid:#4a7c4a;
 }
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;min-height:100vh;padding-bottom:40px}
-
 .header{background:var(--brand);color:#fff;padding:16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
 .header-left h1{font-size:18px;font-weight:700;letter-spacing:-0.3px}
 .header-left p{font-size:12px;opacity:.6;margin-top:2px}
 .refresh-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
 
-.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99}
+/* 탭바 */
+.tabbar{display:flex;background:var(--brand);padding:0 16px;position:sticky;top:57px;z-index:97;gap:4px;border-top:1px solid rgba(255,255,255,.1)}
+.tab-btn{flex:1;background:none;border:none;color:rgba(255,255,255,.6);padding:12px 0;font-size:14px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
+.tab-btn.active{color:#fff;border-bottom-color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.search-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:103px;z-index:99}
 .search-box{display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:0 14px;gap:8px;transition:border-color .15s}
 .search-box:focus-within{border-color:var(--brand)}
 .search-box input{flex:1;border:none;background:transparent;padding:11px 0;font-size:16px;color:var(--text);outline:none}
 .search-box input::placeholder{color:var(--hint)}
 .clear-btn{background:none;border:none;color:var(--hint);font-size:18px;cursor:pointer;padding:2px;display:none}
 
-/* 카테고리 필터 박스 */
-.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:113px;z-index:98}
+.cat-filter-wrap{padding:10px 16px 6px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:157px;z-index:98}
 .cat-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .cat-pills::-webkit-scrollbar{display:none}
 .cat-pill{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--sub);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
 .cat-pill.active{border-color:var(--cs);background:var(--cb);color:var(--ct)}
 .cat-pill .pill-cnt{font-size:11px;opacity:.7;margin-left:1px}
 
-/* 탭 (카테고리 이름 상단 탭 — 제거하고 필터박스로 대체) */
-.tabs-wrap{display:none}
-
 .result-info{padding:6px 16px 2px;font-size:13px;color:var(--hint)}
-
 .list{padding:4px 16px 20px;display:flex;flex-direction:column;gap:8px}
 
-/* 카드 */
 .card{background:var(--surface);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .15s}
 .card:active{opacity:.92}
 .card-head{padding:13px 14px;display:flex;align-items:flex-start;gap:8px}
@@ -49,20 +49,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .chevron{font-size:12px;color:var(--hint);flex-shrink:0;margin-top:3px;transition:transform .2s}
 .card.open .chevron{transform:rotate(180deg)}
 .preview{padding:0 14px 12px;font-size:13px;color:var(--hint);line-height:1.5}
-
 .card-body{padding:0 14px 14px;border-top:1px solid var(--border)}
 .answer-box{margin-top:11px;background:var(--bg);border-radius:10px;padding:12px 13px;font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;user-select:text}
-
 .img-section{margin-top:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .img-label{font-size:12px;font-weight:600;color:var(--sub);padding:7px 12px;background:var(--bg);border-bottom:1px solid var(--border)}
 .img-thumb{width:100%;max-height:220px;object-fit:contain;display:block;background:#f0f0ec;cursor:pointer}
 .img-open{width:100%;padding:9px;background:none;border:none;border-top:1px solid var(--border);font-size:13px;font-weight:600;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
-
 .btn-row{margin-top:10px}
 .copy-btn{width:100%;padding:13px;background:var(--cs,var(--brand));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
 .copy-btn.done{opacity:.75}
 .copy-btn:active{opacity:.85}
-
 .loading{text-align:center;padding:60px 20px;color:var(--hint)}
 .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -71,6 +67,49 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .empty-icon{font-size:41px;margin-bottom:12px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:#1c1c1a;color:#fff;padding:9px 20px;border-radius:20px;font-size:14px;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* AI 탭 */
+.ai-wrap{padding:16px}
+.step-indicator{display:flex;gap:8px;margin-bottom:14px}
+.step{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 4px;text-align:center;font-size:12px;color:var(--hint);display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
+.step .step-num{font-size:15px}
+.step.active{border-color:var(--brand);color:var(--brand);background:var(--brand-light);font-weight:700}
+.step.done{border-color:var(--brand-mid);color:var(--brand-mid)}
+.ai-section{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.ai-label{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px;display:block}
+.ai-sublabel{font-size:12px;font-weight:600;color:var(--hint);margin-bottom:5px;display:block}
+.ai-hint{font-size:12px;color:var(--hint);margin-top:6px;line-height:1.5}
+.ai-textarea{width:100%;min-height:120px;border:1.5px solid var(--border);border-radius:10px;padding:12px;font-size:15px;font-family:inherit;resize:vertical;background:var(--bg);color:var(--text);outline:none}
+.ai-textarea:focus{border-color:var(--brand)}
+.ai-textarea[readonly]{background:var(--brand-light);color:var(--text)}
+.ai-btn-row{display:flex;gap:8px;margin-top:10px}
+.ai-btn{flex:1;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
+.ai-btn:disabled{opacity:.55}
+.ai-btn.secondary{background:var(--brand-mid)}
+.ai-btn.outline{background:none;border:1.5px solid var(--border);color:var(--sub)}
+.ai-btn.outline.active{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.ai-divider{height:1px;background:var(--border);margin:16px 0}
+.ai-divider-wrap{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--hint);font-size:12px;font-weight:700}
+.ai-divider-line{flex:1;height:1px;background:var(--border)}
+.result-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ai-badge{font-size:11px;font-weight:700;background:var(--brand-light);color:var(--brand);padding:3px 9px;border-radius:20px}
+.ai-input-field{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:15px;margin-bottom:12px;background:var(--bg);color:var(--text);outline:none}
+.ai-input-field:focus{border-color:var(--brand)}
+select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%236b6860'/></svg>");background-repeat:no-repeat;background-position:right 14px center}
+
+/* 요금표 탭 */
+.pricing-wrap{padding:16px}
+.loc-toggle{display:flex;gap:8px;margin-bottom:16px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:4px}
+.loc-btn{flex:1;background:none;border:none;padding:11px 0;font-size:15px;font-weight:700;color:var(--sub);border-radius:9px;cursor:pointer;transition:all .15s}
+.loc-btn.active{background:var(--brand);color:#fff}
+.price-group{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.price-group-title{background:var(--brand-light);color:var(--brand);font-size:13px;font-weight:700;padding:10px 14px}
+.price-row{padding:12px 14px;border-top:1px solid var(--border)}
+.price-row:first-of-type{border-top:none}
+.price-row-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.price-detail{font-size:14.5px;font-weight:600;color:var(--text);flex:1}
+.price-amount{font-size:16px;font-weight:700;color:var(--brand);white-space:nowrap}
+.price-sub{font-size:12.5px;color:var(--hint);margin-top:3px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -83,40 +122,121 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <button class="refresh-btn" onclick="loadData()">↺ 새로고침</button>
 </div>
 
-<div class="search-wrap">
-  <div class="search-box">
-    <span style="color:var(--hint);font-size:16px">🔍</span>
-    <input type="search" id="search-input" placeholder="키워드 검색..." oninput="onSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
-    <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+<div class="tabbar">
+  <button class="tab-btn active" data-tab="search" onclick="switchTab('search')">답변검색</button>
+  <!-- Claude API 결제 완료 후 아래 주석 해제하면 AI 탭 다시 노출됨
+  <button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">AI 수정·추가</button>
+  -->
+  <button class="tab-btn" data-tab="pricing" onclick="switchTab('pricing')">요금표</button>
+</div>
+
+<!-- 탭 1: 답변검색 -->
+<div id="tab-search" class="tab-content active">
+  <div class="search-wrap">
+    <div class="search-box">
+      <span style="color:var(--hint);font-size:16px">🔍</span>
+      <input type="search" id="search-input" placeholder="키워드 검색..." oninput="onSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
+
+  <div class="cat-filter-wrap">
+    <div class="cat-pills" id="cat-pills"></div>
+  </div>
+
+  <div class="result-info" id="result-info"></div>
+
+  <div class="list" id="list">
+    <div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>
   </div>
 </div>
 
-<div class="cat-filter-wrap">
-  <div class="cat-pills" id="cat-pills"></div>
+<!-- 탭 2: AI 수정·추가 -->
+<div id="tab-ai" class="tab-content">
+  <div class="ai-wrap">
+
+    <div class="step-indicator" id="step-indicator">
+      <div class="step active" data-step="1"><span class="step-num">①</span><span>내용 입력</span></div>
+      <div class="step" data-step="2"><span class="step-num">②</span><span>AI 다듬기</span></div>
+      <div class="step" data-step="3"><span class="step-num">③</span><span>시트 추가</span></div>
+    </div>
+
+    <div class="ai-section">
+      <label class="ai-label">원본 내용 입력</label>
+      <textarea id="ai-input" class="ai-textarea" placeholder="대충 써도 돼요. AI가 에브리아워 톤으로 다듬어드릴게요 :)"></textarea>
+      <div class="ai-btn-row">
+        <button class="ai-btn" id="ai-refine-btn" onclick="refineAnswer()">✨ AI로 다듬기</button>
+        <button class="ai-btn outline" onclick="resetAi()">↺ 초기화</button>
+      </div>
+    </div>
+
+    <div class="ai-divider-wrap" id="ai-divider-wrap" style="display:none">
+      <div class="ai-divider-line"></div>
+      <span>AI 수정 결과</span>
+      <div class="ai-divider-line"></div>
+    </div>
+
+    <div class="ai-section" id="ai-result-section" style="display:none">
+      <div class="result-label-row">
+        <label class="ai-label" style="margin-bottom:0">다듬어진 답변</label>
+        <span class="ai-badge">AI 수정 완료</span>
+      </div>
+      <textarea id="ai-output" class="ai-textarea" readonly></textarea>
+      <div class="ai-btn-row">
+        <button class="ai-btn outline" onclick="copyAiResult()">📋 복사</button>
+        <button class="ai-btn outline" id="ai-edit-btn" onclick="toggleEditResult()">✏️ 직접 수정</button>
+      </div>
+
+      <div class="ai-divider"></div>
+
+      <label class="ai-label">시트에 저장할 경우 아래 입력</label>
+      <label class="ai-sublabel">카테고리</label>
+      <select id="ai-cat" class="ai-input-field"></select>
+      <label class="ai-sublabel">키워드/태그</label>
+      <input type="text" id="ai-title" class="ai-input-field" placeholder="예: 환불규정, 장기등록할인">
+      <button class="ai-btn" onclick="saveToSheet()">＋ 구글 시트에 추가</button>
+    </div>
+  </div>
 </div>
 
-<div class="result-info" id="result-info"></div>
-<div class="list" id="list">
-  <div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>
+<!-- 탭 3: 요금표 -->
+<div id="tab-pricing" class="tab-content">
+  <div class="pricing-wrap">
+    <div class="loc-toggle">
+      <button class="loc-btn active" data-loc="성수점" onclick="setLocation('성수점')">성수점</button>
+      <button class="loc-btn" data-loc="구의점" onclick="setLocation('구의점')">구의점</button>
+    </div>
+    <div id="pricing-list" class="pricing-list">
+      <div class="loading"><div class="spinner"></div>불러오는 중...</div>
+    </div>
+  </div>
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_ID = '1RVdbwrSjLRANNatKFoElDJ3FlZFdbxew';
+const SHEET_ID = '1EIEif7oFzXegbukrSUXMxZDOiTq5-Dn24Nj6W53Q8jg';
 const GID = '395124987';
+
+// ⚠️ 배포 후 아래 두 값을 실제 URL로 교체하세요
+const RENDER_API_URL = 'https://YOUR-RENDER-APP.onrender.com/api/refine';
+const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+// 요금표 탭 ("요금표(성수,구의)" 탭의 GID)
+const PRICING_GID = '1733758050';
 
 // 카테고리 색상 팔레트 (bg, text, stroke)
 const CAT_COLORS = [
-  {cb:'#e8f0e8',ct:'#1a3d1a',cs:'#2d7a2d'},  // 초록
-  {cb:'#e8f0f8',ct:'#0d2d52',cs:'#2060b0'},  // 파랑
-  {cb:'#f0eef8',ct:'#3b2870',cs:'#7060d0'},  // 보라
-  {cb:'#fff3e8',ct:'#6b3800',cs:'#d07000'},  // 주황
-  {cb:'#fff8e0',ct:'#5c4000',cs:'#b08800'},  // 노랑
-  {cb:'#fdeaea',ct:'#6b1a1a',cs:'#c43030'},  // 빨강
-  {cb:'#e8f8ee',ct:'#0d4020',cs:'#208040'},  // 녹색
-  {cb:'#fde8f5',ct:'#5c1040',cs:'#c030a0'},  // 핑크
-  {cb:'#e8f5fe',ct:'#0d3050',cs:'#1080c8'},  // 하늘
-  {cb:'#f5f0ff',ct:'#3d1a6b',cs:'#8040d0'},  // 라벤더
+{cb:'#e8f0e8',ct:'#1a3d1a',cs:'#2d7a2d'}, // 초록
+{cb:'#e8f0f8',ct:'#0d2d52',cs:'#2060b0'}, // 파랑
+{cb:'#f0eef8',ct:'#3b2870',cs:'#7060d0'}, // 보라
+{cb:'#fff3e8',ct:'#6b3800',cs:'#d07000'}, // 주황
+{cb:'#fff8e0',ct:'#5c4000',cs:'#b08800'}, // 노랑
+{cb:'#fdeaea',ct:'#6b1a1a',cs:'#c43030'}, // 빨강
+{cb:'#e8f8ee',ct:'#0d4020',cs:'#208040'}, // 녹색
+{cb:'#fde8f5',ct:'#5c1040',cs:'#c030a0'}, // 핑크
+{cb:'#e8f5fe',ct:'#0d3050',cs:'#1080c8'}, // 하늘
+{cb:'#f5f0ff',ct:'#3d1a6b',cs:'#8040d0'}, // 라벤더
 ];
 
 let allData = [];
@@ -129,26 +249,10 @@ function getCatColor(cat) {
   return catColorMap[cat] || {cb:'#f0f0f0',ct:'#333',cs:'#999'};
 }
 
-function catStyle(cat) {
-  const c = getCatColor(cat);
-  return `style="background:${c.cb};color:${c.ct};border-color:${c.cs}"`;
-}
-
-function cardStyle(cat) {
-  const c = getCatColor(cat);
-  return `style="border-color:${c.cs}22"`;
-}
-
-function openCardStyle(cat) {
-  const c = getCatColor(cat);
-  return `style="border-color:${c.cs}"`;
-}
-
 async function loadData() {
   document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
   document.getElementById('header-sub').textContent = '불러오는 중...';
   document.getElementById('cat-pills').innerHTML = '';
-
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
   try {
     const res = await fetch(url);
@@ -157,16 +261,14 @@ async function loadData() {
     if (!raw) throw new Error('파싱 실패');
     const json = JSON.parse(raw[1]);
     const rows = json.table.rows;
-
     allData = rows.map((r, i) => ({
       _id: i,
-      cat:    (r.c[0]?.v ?? '').toString().trim(),
-      title:  (r.c[1]?.v ?? '').toString().trim(),
+      cat: (r.c[0]?.v ?? '').toString().trim(),
+      title: (r.c[1]?.v ?? '').toString().trim(),
       answer: (r.c[2]?.v ?? '').toString().trim(),
-      img:    (r.c[3]?.v ?? '').toString().trim(),
+      img: (r.c[3]?.v ?? '').toString().trim(),
     })).filter(d => d.answer);
 
-    // 카테고리 순서대로 색상 배정
     const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
     cats.forEach((c, i) => {
       catColorMap[c] = CAT_COLORS[i % CAT_COLORS.length];
@@ -175,6 +277,7 @@ async function loadData() {
     document.getElementById('header-sub').textContent = `성수점 · ${allData.length}개 답변`;
     renderPills();
     renderList();
+    populateCategoryDropdown();
   } catch(e) {
     document.getElementById('header-sub').textContent = '로드 실패';
     document.getElementById('list').innerHTML = `
@@ -221,7 +324,6 @@ function renderPills() {
       ${c}<span class="pill-cnt">${cnt}</span>
     </button>`;
   }).join('');
-
   wrap.querySelectorAll('.cat-pill').forEach(btn => {
     const cat = btn.dataset.cat;
     const handler = (e) => { e.preventDefault(); setTab(cat); };
@@ -230,10 +332,9 @@ function renderPills() {
   });
 }
 
-
 function getLinkBlock(url, color) {
-  const isSheet   = url.includes('docs.google.com/spreadsheets');
-  const isFolder  = url.includes('drive.google.com/folders') || url.includes('drive.google.com/drive');
+  const isSheet = url.includes('docs.google.com/spreadsheets');
+  const isFolder = url.includes('drive.google.com/folders') || url.includes('drive.google.com/drive');
   const isImgFile = url.match(/\.(jpg|jpeg|png|gif|webp)/i) || url.includes('drive.google.com/file');
 
   if (isImgFile) {
@@ -265,7 +366,6 @@ function renderList() {
     const id = d._id;
     const isOpen = openId === id;
     const col = getCatColor(d.cat);
-    // 키워드/태그 있으면 우선, 없으면 답변 첫 줄을 제목으로
     const firstLine = d.answer.split('\n').find(l => l.trim()) || '';
     const titleText = d.title || firstLine.slice(0, 28) + (firstLine.length > 28 ? '…' : '');
     const previewSrc = d.title ? d.answer : d.answer.replace(firstLine, '').trim();
@@ -364,6 +464,238 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ===== 탭 전환 ===== */
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.getElementById('tab-search').classList.toggle('active', name === 'search');
+  document.getElementById('tab-ai').classList.toggle('active', name === 'ai');
+  document.getElementById('tab-pricing').classList.toggle('active', name === 'pricing');
+  if (name === 'pricing' && !pricingLoaded) loadPricing();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ===== 요금표 ===== */
+let pricingData = { 성수점: [], 구의점: [] };
+let pricingLoaded = false;
+let activeLocation = '성수점';
+
+async function loadPricing() {
+  const list = document.getElementById('pricing-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
+
+  // A6:M100 범위만 가져와서 제목/헤더 행은 건너뜀
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRICING_GID}&range=A6:M100`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const raw = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?\s*$/);
+    if (!raw) throw new Error('파싱 실패');
+    const json = JSON.parse(raw[1]);
+    const rows = json.table.rows;
+
+    const seongsu = [];
+    const guui = [];
+    let lastCat = '';
+
+    rows.forEach(r => {
+      const c = r.c || [];
+      const cell = (i) => c[i] ? c[i] : null;
+      const val = (i) => {
+        const cl = cell(i);
+        return cl && cl.v !== null && cl.v !== undefined ? cl.v.toString().trim() : '';
+      };
+      const num = (i) => {
+        const cl = cell(i);
+        if (!cl || cl.v === null || cl.v === undefined || cl.v === '') return null;
+        return { v: cl.v, f: cl.f || null };
+      };
+
+      const cat = val(0);      // A: 요금제(카테고리)
+      const detail = val(1);   // B: 상세
+      if (!detail) return;     // 빈 행(구분선) 스킵
+      if (cat) lastCat = cat;
+
+      // 성수점: E 유효기간, F 금액, G 기준, H 비고
+      const sValid = val(4), sAmt = num(5), sCriteria = val(6), sNote = val(7);
+      // 구의점: J 기준, K 금액, L 유효기간, M 비고
+      const gCriteria = val(9), gAmt = num(10), gValid = val(11), gNote = val(12);
+
+      if (sAmt) {
+        seongsu.push({ cat: lastCat, detail, amount: sAmt, valid: sValid, criteria: sCriteria, note: sNote });
+      }
+      if (gAmt) {
+        guui.push({ cat: lastCat, detail, amount: gAmt, valid: gValid, criteria: gCriteria, note: gNote });
+      }
+    });
+
+    pricingData = { 성수점: seongsu, 구의점: guui };
+    pricingLoaded = true;
+    renderPricing();
+  } catch (e) {
+    console.error(e);
+    list.innerHTML = `<div class="error-box">
+      ⚠️ 요금표를 불러오지 못했어요.<br><br>
+      "${PRICING_GID}" GID의 시트 공유 설정을 확인해주세요.<br>
+      <strong>일반 액세스 → 링크가 있는 모든 사용자 → 뷰어</strong>
+    </div>`;
+  }
+}
+
+function setLocation(loc) {
+  activeLocation = loc;
+  document.querySelectorAll('.loc-btn').forEach(b => b.classList.toggle('active', b.dataset.loc === loc));
+  renderPricing();
+}
+
+function renderPricing() {
+  const items = pricingData[activeLocation] || [];
+  const list = document.getElementById('pricing-list');
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">💳</div><p style="font-size:15px;margin-top:4px">요금 정보가 없어요</p></div>`;
+    return;
+  }
+
+  const groups = [...new Set(items.map(d => d.cat))];
+
+  list.innerHTML = groups.map(g => {
+    const groupItems = items.filter(d => d.cat === g);
+    return `<div class="price-group">
+      <div class="price-group-title">${esc(g)}</div>
+      ${groupItems.map(d => `
+        <div class="price-row">
+          <div class="price-row-main">
+            <span class="price-detail">${esc(d.detail)}</span>
+            <span class="price-amount">${formatWon(d.amount)}</span>
+          </div>
+          ${(d.valid || d.criteria || d.note) ? `<div class="price-sub">${[d.valid, d.criteria, d.note].filter(Boolean).map(esc).join(' · ')}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('');
+}
+
+function formatWon(amt) {
+  if (!amt) return '';
+  if (amt.f) return amt.f.replace(/^₩?\s*/, '').trim() + (amt.f.includes('원') ? '' : '원');
+  const num = Number(amt.v);
+  if (isNaN(num)) return String(amt.v);
+  return num.toLocaleString('ko-KR') + '원';
+}
+
+/* ===== AI 수정·추가 ===== */
+function setStep(n) {
+  document.querySelectorAll('.step').forEach(el => {
+    const s = Number(el.dataset.step);
+    el.classList.toggle('active', s === n);
+    el.classList.toggle('done', s < n);
+  });
+}
+
+function populateCategoryDropdown() {
+  const sel = document.getElementById('ai-cat');
+  if (!sel) return;
+  const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
+  sel.innerHTML = cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+}
+
+async function refineAnswer() {
+  const input = document.getElementById('ai-input').value.trim();
+  if (!input) { showAiToast('원본 내용을 입력해주세요'); return; }
+
+  const btn = document.getElementById('ai-refine-btn');
+  btn.disabled = true;
+  btn.textContent = '다듬는 중...';
+  setStep(2);
+
+  try {
+    const res = await fetch(RENDER_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: input })
+    });
+    if (!res.ok) throw new Error('서버 오류: ' + res.status);
+    const data = await res.json();
+    if (!data.refined) throw new Error('응답 없음');
+
+    document.getElementById('ai-output').value = data.refined;
+    document.getElementById('ai-output').readOnly = true;
+    document.getElementById('ai-edit-btn').classList.remove('active');
+    document.getElementById('ai-edit-btn').textContent = '✏️ 직접 수정';
+    document.getElementById('ai-divider-wrap').style.display = 'flex';
+    document.getElementById('ai-result-section').style.display = 'block';
+    document.getElementById('ai-result-section').scrollIntoView({behavior:'smooth', block:'nearest'});
+    setStep(3);
+  } catch (e) {
+    showAiToast('다듬기 실패: 서버 연결을 확인해주세요');
+    console.error(e);
+    setStep(1);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ AI로 다듬기';
+  }
+}
+
+function toggleEditResult() {
+  const box = document.getElementById('ai-output');
+  const btn = document.getElementById('ai-edit-btn');
+  const willEdit = box.readOnly;
+  box.readOnly = !willEdit;
+  btn.classList.toggle('active', willEdit);
+  btn.textContent = willEdit ? '✓ 수정 완료' : '✏️ 직접 수정';
+  if (willEdit) box.focus();
+}
+
+function copyAiResult() {
+  const text = document.getElementById('ai-output').value;
+  if (!text) return;
+  const copy = () => showAiToast('클립보드에 복사됐어요 ✓');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(copy).catch(() => fallbackCopy(text, copy));
+  } else {
+    fallbackCopy(text, copy);
+  }
+}
+
+function resetAi() {
+  document.getElementById('ai-input').value = '';
+  document.getElementById('ai-output').value = '';
+  document.getElementById('ai-output').readOnly = true;
+  document.getElementById('ai-edit-btn').classList.remove('active');
+  document.getElementById('ai-edit-btn').textContent = '✏️ 직접 수정';
+  document.getElementById('ai-title').value = '';
+  document.getElementById('ai-result-section').style.display = 'none';
+  document.getElementById('ai-divider-wrap').style.display = 'none';
+  setStep(1);
+}
+
+async function saveToSheet() {
+  const cat = document.getElementById('ai-cat').value.trim();
+  const title = document.getElementById('ai-title').value.trim();
+  const answer = document.getElementById('ai-output').value.trim();
+
+  if (!cat || !answer) { showAiToast('카테고리와 답변 내용을 확인해주세요'); return; }
+
+  try {
+    // Apps Script 웹앱은 preflight(OPTIONS)를 처리하지 못하므로
+    // Content-Type 헤더를 지정하지 않아 simple request로 전송합니다.
+    await fetch(SHEET_WEBAPP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ cat, title, answer, img: '' })
+    });
+    showAiToast('시트에 추가됐어요 ✓ (답변검색 탭에서 새로고침 후 확인)');
+    resetAi();
+  } catch (e) {
+    showAiToast('저장 실패: 잠시 후 다시 시도해주세요');
+    console.error(e);
+  }
+}
+
+function showAiToast(msg) {
+  showToast(msg);
 }
 
 loadData();
