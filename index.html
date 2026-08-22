@@ -234,20 +234,20 @@ async function loadData() {
   document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
   document.getElementById('header-sub').textContent = '불러오는 중...';
   document.getElementById('cat-pills').innerHTML = '';
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
+  // gviz(캐시 지연/노드 불일치)가 아니라 Apps Script에서 라이브 시트를 직접 읽는다.
+  // 각 항목의 실제 시트 행번호(row)를 함께 받아 수정/삭제/이동에 그대로 사용 → 항상 정확.
+  const url = `${SHEET_WEBAPP_URL}?action=list&_=${Date.now()}`;
   try {
     const res = await fetch(url);
-    const text = await res.text();
-    const raw = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?\s*$/);
-    if (!raw) throw new Error('파싱 실패');
-    const json = JSON.parse(raw[1]);
-    const rows = json.table.rows;
-    allData = rows.map((r, i) => ({
+    const data = await res.json();
+    if (!data || !data.ok || !Array.isArray(data.rows)) throw new Error('list 응답 오류');
+    allData = data.rows.map((r, i) => ({
       _id: i,
-      cat: (r.c[0]?.v ?? '').toString().trim(),
-      title: (r.c[1]?.v ?? '').toString().trim(),
-      answer: (r.c[2]?.v ?? '').toString().trim(),
-      img: (r.c[3]?.v ?? '').toString().trim(),
+      row: r.row,               // 실제 시트 행번호
+      cat: (r.cat ?? '').toString().trim(),
+      title: (r.title ?? '').toString().trim(),
+      answer: (r.answer ?? '').toString().trim(),
+      img: (r.img ?? '').toString().trim(),
     })).filter(d => d.answer);
 
     const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
@@ -632,10 +632,8 @@ function showAiToast(msg) {
   showToast(msg);
 }
 
-/* ===== 답변 삭제 / 순서 이동 (앱스크립트 delete/move 액션) ===== */
-// gviz는 headers=1이라 데이터 첫 행(_id=0)이 시트 2행 → 실제 시트 행 = _id + 2
-function sheetRowOf(id) { return id + 2; }
-
+/* ===== 답변 삭제 / 순서 이동 / 수정 (앱스크립트 delete/move/update 액션) =====
+   행번호는 loadData가 list로 받아온 실제 시트 행(d.row)을 그대로 사용한다. */
 async function postWebApp(payload) {
   // Apps Script 웹앱은 preflight(OPTIONS)를 처리 못하므로 Content-Type 미지정(simple request).
   // 응답은 access-control-allow-origin:* 라서 res.json()으로 결과 검증 가능.
@@ -656,7 +654,7 @@ async function saveEdit(id) {
   try {
     const data = await postWebApp({
       action: 'update',
-      row: sheetRowOf(id),
+      row: d.row,
       title, answer, img,
       verify: { cat: d.cat, title: d.title, ans: d.answer }
     });
@@ -681,7 +679,7 @@ async function deleteItem(id) {
   try {
     const data = await postWebApp({
       action: 'delete',
-      row: sheetRowOf(id),
+      row: d.row,
       verify: { cat: d.cat, title: d.title, ans: d.answer }
     });
     if (data && data.ok) {
@@ -708,8 +706,8 @@ async function moveItem(id, dir) {
   try {
     const data = await postWebApp({
       action: 'move',
-      rowA: sheetRowOf(id),
-      rowB: sheetRowOf(nb._id),
+      rowA: d.row,
+      rowB: nb.row,
       verifyA: { cat: d.cat, title: d.title, ans: d.answer },
       verifyB: { cat: nb.cat, title: nb.title, ans: nb.answer }
     });
