@@ -105,7 +105,8 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
 
 /* 요금표 탭 */
 .pricing-wrap{padding:16px}
-.loc-toggle{display:flex;gap:8px;margin-bottom:16px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:4px}
+.loc-toggle-wrap{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:103px;z-index:98}
+.loc-toggle{display:flex;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:4px}
 .loc-btn{flex:1;background:none;border:none;padding:11px 0;font-size:15px;font-weight:700;color:var(--sub);border-radius:9px;cursor:pointer;transition:all .15s}
 .loc-btn.active{background:var(--brand);color:#fff}
 .price-group{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
@@ -115,7 +116,9 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
 .price-row-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .price-detail{font-size:14.5px;font-weight:600;color:var(--text);flex:1}
 .price-amount{font-size:16px;font-weight:700;color:var(--brand);white-space:nowrap}
-.price-sub{font-size:12.5px;color:var(--hint);margin-top:3px;line-height:1.5}
+.price-sub-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:3px}
+.price-sub{font-size:12.5px;color:var(--hint);line-height:1.5}
+.price-rate{font-size:11.5px;font-weight:500;color:var(--hint);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -181,11 +184,13 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
 
 <!-- 탭 3: 요금표 -->
 <div id="tab-pricing" class="tab-content">
-  <div class="pricing-wrap">
+  <div class="loc-toggle-wrap">
     <div class="loc-toggle">
       <button class="loc-btn active" data-loc="성수점" onclick="setLocation('성수점')">성수점</button>
       <button class="loc-btn" data-loc="구의점" onclick="setLocation('구의점')">구의점</button>
     </div>
+  </div>
+  <div class="pricing-wrap">
     <div id="pricing-list" class="pricing-list">
       <div class="loading"><div class="spinner"></div>불러오는 중...</div>
     </div>
@@ -202,8 +207,8 @@ const GID = '395124987';
 const RENDER_API_URL = 'https://YOUR-RENDER-APP.onrender.com/api/refine';
 const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyunGFVicRGQEEvagYuuLT6r_nSmSbdZIyEbwMTG1ab1uq0ItyC1huz8Q5FJuKNpu3C/exec';
 
-// 요금표 탭의 GID
-const PRICING_GID = '647769517';
+// 요금표 탭의 GID (2026-09 요금 개편 반영 — "개편 최종" 탭)
+const PRICING_GID = '366374810';
 
 // 카테고리 색상 팔레트 (bg, text, stroke)
 const CAT_COLORS = [
@@ -308,9 +313,27 @@ function renderPills() {
   }).join('');
   wrap.querySelectorAll('.cat-pill').forEach(btn => {
     const cat = btn.dataset.cat;
-    const handler = (e) => { e.preventDefault(); setTab(cat); };
-    btn.addEventListener('touchend', handler);
-    btn.addEventListener('click', handler);
+    // 스와이프로 스크롤하다 손을 뗀 지점의 알약이 오선택되는 문제 방지:
+    // touchstart 좌표 대비 touchend 이동거리가 임계값(10px) 넘으면 "스크롤"로 보고 선택 안 함
+    let touchStartX = 0, touchStartY = 0, touchMoved = false;
+    btn.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchMoved = false;
+    }, { passive: true });
+    btn.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - touchStartX) > 10 || Math.abs(t.clientY - touchStartY) > 10) {
+        touchMoved = true;
+      }
+    }, { passive: true });
+    btn.addEventListener('touchend', (e) => {
+      if (touchMoved) return; // 스크롤 동작이었으므로 선택하지 않음
+      e.preventDefault();
+      setTab(cat);
+    });
+    btn.addEventListener('click', () => setTab(cat));
   });
 }
 
@@ -525,16 +548,16 @@ async function loadPricing() {
       if (!detail) return;     // 빈 행(구분선) 스킵
       if (cat) lastCat = cat;
 
-      // 성수점: C 유효기간, D 금액
-      const sValid = val(2), sAmt = num(3);
-      // 구의점: F 유효기간, G 금액 (E는 spacer)
-      const gValid = val(5), gAmt = num(6);
+      // 성수점: C 유효기간, D 금액, E 시/일당
+      const sValid = val(2), sAmt = num(3), sRate = num(4);
+      // 구의점: G 유효기간, H 금액, I 시/일당 (F는 spacer)
+      const gValid = val(6), gAmt = num(7), gRate = num(8);
 
       if (sAmt) {
-        seongsu.push({ cat: lastCat, detail, amount: sAmt, valid: sValid });
+        seongsu.push({ cat: lastCat, detail, amount: sAmt, valid: sValid, rate: sRate });
       }
       if (gAmt) {
-        guui.push({ cat: lastCat, detail, amount: gAmt, valid: gValid });
+        guui.push({ cat: lastCat, detail, amount: gAmt, valid: gValid, rate: gRate });
       }
     });
 
@@ -578,7 +601,10 @@ function renderPricing() {
             <span class="price-detail">${esc(d.detail)}</span>
             <span class="price-amount">${formatWon(d.amount)}</span>
           </div>
-          ${d.valid ? `<div class="price-sub">${esc(d.valid)}</div>` : ''}
+          ${(d.valid || d.rate) ? `<div class="price-sub-row">
+            <span class="price-sub">${d.valid ? esc(d.valid) : ''}</span>
+            <span class="price-rate">${d.rate ? formatRate(d.rate, g) : ''}</span>
+          </div>` : ''}
         </div>
       `).join('')}
     </div>`;
@@ -591,6 +617,12 @@ function formatWon(amt) {
   const num = Number(amt.v);
   if (isNaN(num)) return String(amt.v);
   return num.toLocaleString('ko-KR') + '원';
+}
+
+// 기간권·사물함은 일 단위, 그 외(1회권/충전권)는 시간 단위로 계산된 값
+function formatRate(rate, cat) {
+  const unit = (cat.includes('기간권') || cat.includes('장기권') || cat.includes('사물함')) ? '일' : '시간';
+  return formatWon(rate) + '/' + unit;
 }
 
 /* ===== 답변 추가 (간이 버전: Claude API 결제 전) ===== */
@@ -729,6 +761,7 @@ function adjustStickyOffsets() {
   const tabbar = document.querySelector('.tabbar');
   const searchWrap = document.querySelector('.search-wrap');
   const catFilterWrap = document.querySelector('.cat-filter-wrap');
+  const locToggleWrap = document.querySelector('.loc-toggle-wrap');
   if (!header || !tabbar || !searchWrap || !catFilterWrap) return;
 
   const headerH = header.offsetHeight;
@@ -738,6 +771,7 @@ function adjustStickyOffsets() {
   tabbar.style.top = headerH + 'px';
   searchWrap.style.top = (headerH + tabbarH) + 'px';
   catFilterWrap.style.top = (headerH + tabbarH + searchH) + 'px';
+  if (locToggleWrap) locToggleWrap.style.top = (headerH + tabbarH) + 'px';
 }
 
 window.addEventListener('load', adjustStickyOffsets);
