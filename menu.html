@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>에브리아워 요금 메뉴판</title>
+<style>
+:root{--bg:#edeff2;--surface:#fff;--brand:#2563eb;--border:#e5e7eb;--text:#111827;--sub:#6b7280;--hint:#9ca3af;--star:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard',sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 12px 48px}
+.controls{display:flex;gap:8px;margin-bottom:16px}
+.controls button{border:1.5px solid var(--border);background:var(--surface);color:var(--sub);font-size:14px;font-weight:700;padding:8px 18px;border-radius:999px;cursor:pointer}
+.controls button.active{background:var(--brand);border-color:var(--brand);color:#fff}
+body.clean .controls{display:none}
+#poster{width:100%;max-width:520px;background:var(--surface);border-radius:20px;padding:28px 24px 24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.head{text-align:center;padding-bottom:18px;border-bottom:2px solid var(--text);margin-bottom:8px}
+.head .brand{font-size:13px;font-weight:700;color:var(--brand);letter-spacing:.08em}
+.head h1{font-size:26px;font-weight:800;margin-top:4px}
+.head .loc{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;background:var(--brand);color:#fff;padding:4px 14px;border-radius:999px}
+.group{margin-top:22px}
+.group-title{font-size:15px;font-weight:800;color:var(--brand);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:2px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--border)}
+.row:last-child{border-bottom:none}
+.name{font-size:15px;font-weight:600}
+.valid{font-size:12px;color:var(--hint);margin-top:2px}
+.star{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;background:var(--star);padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.amt{font-size:17px;font-weight:800;white-space:nowrap}
+.loading,.err{text-align:center;color:var(--sub);padding:40px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="controls">
+  <button data-loc="성수점" onclick="setLoc('성수점')">성수점</button>
+  <button data-loc="구의점" onclick="setLoc('구의점')">구의점</button>
+</div>
+<div id="poster"><div class="loading">불러오는 중...</div></div>
+
+<script>
+const SHEET_ID = '1EIEif7oFzXegbukrSUXMxZDOiTq5-Dn24Nj6W53Q8jg';
+const MENU_GID = '1577466456';
+const params = new URLSearchParams(location.search);
+let loc = params.get('loc') === '구의점' ? '구의점' : '성수점';
+if (params.get('clean') === '1') document.body.classList.add('clean');
+let data = { '성수점': [], '구의점': [] };
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const won = n => n.toLocaleString('ko-KR') + '원';
+
+async function load() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${MENU_GID}&headers=0&_=${Date.now()}`;
+    const txt = await (await fetch(url)).text();
+    const json = JSON.parse(txt.match(/setResponse\(([\s\S]*)\);?/)[1]);
+    const val = (r, i) => { const c = r.c[i]; return c && c.v != null ? String(c.v).trim() : ''; };
+    const num = (r, i) => { const c = r.c[i]; return c && typeof c.v === 'number' ? c.v : 0; };
+    let lastCat = '';
+    json.table.rows.forEach((r, idx) => {
+      if (idx < 2) return;
+      const cat = val(r, 0), detail = val(r, 1);
+      if (!detail) return;
+      if (cat) lastCat = cat;
+      const s = num(r, 3), g = num(r, 7);
+      if (s) data['성수점'].push({ cat: lastCat, detail, amount: s, valid: val(r, 2) });
+      if (g) data['구의점'].push({ cat: lastCat, detail, amount: g, valid: val(r, 6) });
+    });
+    render();
+  } catch (e) {
+    document.getElementById('poster').innerHTML = '<div class="err">불러오기에 실패했어요. 새로고침 해주세요.</div>';
+  }
+}
+
+function setLoc(l) { loc = l; render(); }
+
+function render() {
+  document.querySelectorAll('.controls button').forEach(b => b.classList.toggle('active', b.dataset.loc === loc));
+  const groups = [];
+  data[loc].forEach(d => {
+    let g = groups.find(x => x.cat === d.cat);
+    if (!g) groups.push(g = { cat: d.cat, items: [] });
+    g.items.push(d);
+  });
+  document.getElementById('poster').innerHTML = `
+    <div class="head">
+      <div class="brand">EVERYHOUR STUDY CAFE</div>
+      <h1>이용 요금 안내</h1>
+      <span class="loc">${esc(loc)}</span>
+    </div>
+    ${groups.map(g => `
+      <div class="group">
+        <div class="group-title">${esc(g.cat)}</div>
+        ${g.items.map(d => {
+          const star = d.detail.includes('★');
+          const name = d.detail.replace(/\s*★\s*/g, '').trim();
+          return `<div class="row">
+            <div>
+              <div class="name">${esc(name)}${star ? '<span class="star">추천</span>' : ''}</div>
+              ${d.valid ? `<div class="valid">${esc(d.valid)}</div>` : ''}
+            </div>
+            <div class="amt">${won(d.amount)}</div>
+          </div>`;
+        }).join('')}
+      </div>`).join('')}`;
+}
+
+load();
+</script>
+</body>
+</html>
