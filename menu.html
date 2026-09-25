@@ -79,6 +79,15 @@ function render() {
     if (!g) groups.push(g = { cat: d.cat, items: [] });
     g.items.push(d);
   });
+  if (loc === '구의점') {
+    const ci = groups.findIndex(g => g.cat.includes('충전권'));
+    if (ci >= 0) {
+      const period = groups.filter(g => g.cat.includes('기간권'));
+      const rest = groups.filter(g => !g.cat.includes('기간권'));
+      rest.splice(rest.findIndex(g => g.cat.includes('충전권')), 0, ...period);
+      groups.splice(0, groups.length, ...rest);
+    }
+  }
   document.getElementById('poster').innerHTML = `
     <div class="head">
       <div class="brand">EVERYHOUR STUDY CAFE</div>
