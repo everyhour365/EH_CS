@@ -12,6 +12,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .controls button{border:1.5px solid var(--border);background:var(--surface);color:var(--sub);font-size:14px;font-weight:700;padding:8px 18px;border-radius:999px;cursor:pointer}
 .controls button.active{background:var(--brand);border-color:var(--brand);color:#fff}
 body.clean .controls{display:none}
+body.clean{padding-top:56px;padding-bottom:72px}
 #poster{width:100%;max-width:520px;background:var(--surface);border-radius:20px;padding:28px 24px 24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .head{text-align:center;padding-bottom:18px;border-bottom:2px solid var(--text);margin-bottom:8px}
 .head .brand{font-size:13px;font-weight:700;color:var(--brand);letter-spacing:.08em}
@@ -59,9 +60,9 @@ async function load() {
       const cat = val(r, 0), detail = val(r, 1);
       if (!detail) return;
       if (cat) lastCat = cat;
-      const s = num(r, 3), g = num(r, 7);
+      const s = num(r, 3), g = num(r, 6);
       if (s) data['성수점'].push({ cat: lastCat, detail, amount: s, valid: val(r, 2) });
-      if (g) data['구의점'].push({ cat: lastCat, detail, amount: g, valid: val(r, 6) });
+      if (g) data['구의점'].push({ cat: lastCat, detail, amount: g, valid: val(r, 5) });
     });
     render();
   } catch (e) {

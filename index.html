@@ -589,7 +589,15 @@ function renderPricing() {
     return;
   }
 
-  const groups = [...new Set(items.map(d => d.cat))];
+  let groups = [...new Set(items.map(d => d.cat))];
+
+  if (activeLocation === '구의점') {
+    const period = groups.filter(g => g.includes('기간권'));
+    const rest = groups.filter(g => !g.includes('기간권'));
+    const ci = rest.findIndex(g => g.includes('충전권'));
+    if (period.length && ci >= 0) rest.splice(ci, 0, ...period);
+    groups = rest;
+  }
 
   list.innerHTML = groups.map(g => {
     const groupItems = items.filter(d => d.cat === g);
