@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EH CS System</title>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com">
+<link rel="preconnect" href="https://docs.google.com">
+<link rel="dns-prefetch" href="https://script.google.com">
+<link rel="dns-prefetch" href="https://docs.google.com">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -235,10 +240,49 @@ function getCatColor(cat) {
   return catColorMap[cat] || {cb:'#f0f0f0',ct:'#333',cs:'#999'};
 }
 
+const CACHE_KEY = 'eh_cs_answers_cache_v1';
+
+function applyRows(rows) {
+  allData = rows.map((r, i) => ({
+    _id: i,
+    row: r.row,               // 실제 시트 행번호
+    cat: (r.cat ?? '').toString().trim(),
+    title: (r.title ?? '').toString().trim(),
+    answer: (r.answer ?? '').toString().trim(),
+    img: (r.img ?? '').toString().trim(),
+  })).filter(d => d.answer);
+
+  const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
+  cats.forEach((c, i) => {
+    catColorMap[c] = CAT_COLORS[i % CAT_COLORS.length];
+  });
+
+  document.getElementById('header-sub').textContent = `성수점 · ${allData.length}개 답변`;
+  renderPills();
+  renderList();
+  populateCategoryDropdown();
+  adjustStickyOffsets();
+}
+
+// Apps Script 응답(2~3초대)이 gviz보다 느려서 체감 로딩이 길다.
+// localStorage에 마지막 결과를 캐싱해 즉시 보여주고(stale), 뒤에서 최신 데이터를 받아 조용히 갱신(revalidate)한다.
+// 캐시가 없는 최초 1회만 스피너가 보인다.
 async function loadData() {
-  document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
-  document.getElementById('header-sub').textContent = '불러오는 중...';
-  document.getElementById('cat-pills').innerHTML = '';
+  let hasCache = false;
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && Array.isArray(cached.rows)) {
+      applyRows(cached.rows);
+      hasCache = true;
+    }
+  } catch(e) {}
+
+  if (!hasCache) {
+    document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터 불러오는 중...</div>';
+    document.getElementById('header-sub').textContent = '불러오는 중...';
+    document.getElementById('cat-pills').innerHTML = '';
+  }
+
   // gviz(캐시 지연/노드 불일치)가 아니라 Apps Script에서 라이브 시트를 직접 읽는다.
   // 각 항목의 실제 시트 행번호(row)를 함께 받아 수정/삭제/이동에 그대로 사용 → 항상 정확.
   const url = `${SHEET_WEBAPP_URL}?action=list&_=${Date.now()}`;
@@ -246,26 +290,10 @@ async function loadData() {
     const res = await fetch(url);
     const data = await res.json();
     if (!data || !data.ok || !Array.isArray(data.rows)) throw new Error('list 응답 오류');
-    allData = data.rows.map((r, i) => ({
-      _id: i,
-      row: r.row,               // 실제 시트 행번호
-      cat: (r.cat ?? '').toString().trim(),
-      title: (r.title ?? '').toString().trim(),
-      answer: (r.answer ?? '').toString().trim(),
-      img: (r.img ?? '').toString().trim(),
-    })).filter(d => d.answer);
-
-    const cats = [...new Set(allData.map(d => d.cat).filter(Boolean))];
-    cats.forEach((c, i) => {
-      catColorMap[c] = CAT_COLORS[i % CAT_COLORS.length];
-    });
-
-    document.getElementById('header-sub').textContent = `성수점 · ${allData.length}개 답변`;
-    renderPills();
-    renderList();
-    populateCategoryDropdown();
-    adjustStickyOffsets();
+    applyRows(data.rows);
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ rows: data.rows, ts: Date.now() })); } catch(e) {}
   } catch(e) {
+    if (hasCache) return; // 캐시로 이미 화면을 보여주고 있으면 실패해도 조용히 무시(다음 새로고침에 재시도)
     document.getElementById('header-sub').textContent = '로드 실패';
     document.getElementById('list').innerHTML = `
       <div class="error-box">
