@@ -179,6 +179,8 @@ select.ai-input-field{appearance:none;-webkit-appearance:none;background-image:u
       <select id="ai-cat" class="ai-input-field"></select>
       <label class="ai-sublabel">키워드/태그</label>
       <input type="text" id="ai-title" class="ai-input-field" placeholder="예: 환불규정, 장기등록할인">
+      <label class="ai-sublabel">이미지/링크 (선택)</label>
+      <input type="text" id="ai-img" class="ai-input-field" placeholder="이미지 URL 또는 참고 링크">
       <div class="ai-btn-row">
         <button class="ai-btn" onclick="saveToSheet()">＋ 구글 시트에 추가</button>
         <button class="ai-btn outline" onclick="resetAi()">↺ 초기화</button>
@@ -672,12 +674,14 @@ function populateCategoryDropdown() {
 function resetAi() {
   document.getElementById('ai-input').value = '';
   document.getElementById('ai-title').value = '';
+  document.getElementById('ai-img').value = '';
 }
 
 async function saveToSheet() {
   const cat = document.getElementById('ai-cat').value.trim();
   const title = document.getElementById('ai-title').value.trim();
   const answer = document.getElementById('ai-input').value.trim();
+  const img = document.getElementById('ai-img').value.trim();
 
   if (!cat || !answer) { showAiToast('카테고리와 답변 내용을 확인해주세요'); return; }
 
@@ -686,7 +690,7 @@ async function saveToSheet() {
     // Content-Type 헤더를 지정하지 않아 simple request로 전송합니다.
     await fetch(SHEET_WEBAPP_URL, {
       method: 'POST',
-      body: JSON.stringify({ cat, title, answer, img: '' })
+      body: JSON.stringify({ cat, title, answer, img })
     });
     showAiToast('시트에 추가됐어요 ✓ (답변검색 탭에서 새로고침 후 확인)');
     resetAi();
